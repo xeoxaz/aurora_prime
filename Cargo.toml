@@ -1,7 +1,6 @@
 [package]
 name = "aurora_prime"
 version = "0.0.1"
-edition = "2025"
 authors = ["Xeoxaz <Xeoxaz@outlook.com>"]
 description = "A better web."
 repository = "https://github.com/xeoxaz/aurora_prime"
