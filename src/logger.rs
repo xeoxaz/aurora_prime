@@ -1,6 +1,5 @@
 use chrono::Local;
-use std::fs::OpenOptions;
-use std::io::Write;
+use colored::Colorize;
 
 // Enum for log levels to ensure type safety
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -14,38 +13,39 @@ pub enum LogLevel {
 #[derive(Debug)]
 pub struct Logger {
     name: String,
-    log_to_file: Option<String>, // Optional file path for logging
 }
 
 impl Logger {
-    /// Creates a new Logger with a name and optional file output.
-    pub fn new(name: String, log_to_file: Option<String>) -> Self {
-        Logger { name, log_to_file }
+    /// Creates a new Logger with a name.
+    pub fn new(name: &str) -> Self {
+        Logger { name: name.to_string() }
     }
 
-    /// Logs a message with the specified level.
+    /// Logs a message with the specified level to the console.
     fn log(&self, level: LogLevel, message: &str) {
-        let now = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+        let now = Local::now().format("%H:%M:%S").to_string();
         let level_str = match level {
-            LogLevel::Info => "INFO",
-            LogLevel::Warn => "WARN",
-            LogLevel::Error => "ERROR",
+            LogLevel::Info => "INFO".green(),
+            LogLevel::Warn => "WARN".yellow(),
+            LogLevel::Error => "ERROR".red(),
         };
-        let log_message = format!("[{}] {} | {} - {}", now, self.name, level_str, message);
+        // Pad name to 5 characters, level_str to 5 characters; gray brackets
+        let log_message = format!(
+            "{}{}{} {}{:5}{} {}{:5}{} {}",
+            "[".bright_black(),
+            now,
+            "]".bright_black(),
+            "[".bright_black(),
+            self.name,
+            "]".bright_black(),
+            "[".bright_black(),
+            level_str,
+            "]".bright_black(),
+            message
+        );
 
         // Output to console
         println!("{}", log_message);
-
-        // Output to file if configured
-        if let Some(file_path) = &self.log_to_file {
-            if let Ok(mut file) = OpenOptions::new()
-                .create(true)
-                .append(true)
-                .open(file_path)
-            {
-                let _ = writeln!(file, "{}", log_message);
-            }
-        }
     }
 
     /// Logs an info-level message.
@@ -61,5 +61,14 @@ impl Logger {
     /// Logs an error-level message.
     pub fn error(&self, message: &str) {
         self.log(LogLevel::Error, message);
+    }
+
+    pub fn basic(&self, message: &str){
+        println!("{}", message);
+    }
+
+    // Clear the console
+    pub fn clear(&self){
+        print!("\x1B[2J\x1B[1;1H");
     }
 }

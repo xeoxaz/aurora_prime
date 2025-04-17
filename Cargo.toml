@@ -9,3 +9,5 @@ license = "Proprietary"
 
 [dependencies]
 chrono = "0.4.40"
+colored = "3.0.0"
+rustdb = "5.2.114"
